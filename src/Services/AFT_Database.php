@@ -10,22 +10,21 @@
 
 namespace Above_Fold_Tracker\Services;
 
-if (class_exists('AFT_Database')) {
+if ( class_exists( 'AFT_Database' ) ) {
 	return;
 }
 
-class AFT_Database
-{
+class AFT_Database {
+
 	/**
 	 * Create necessary database tables for the plugin.
 	 *
 	 * @return void
 	 */
-	public static function create_tables()
-	{
+	public static function create_tables() {
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'above_fold_tracker';
+		$table_name      = $wpdb->prefix . 'above_fold_tracker';
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$table_name} (
@@ -39,17 +38,16 @@ class AFT_Database
         ) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta($sql);
+		dbDelta( $sql );
 	}
 
 	/**
 	 * Drop the database table.
 	 */
-	public static function drop_table()
-	{
+	public static function drop_table() {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'above_fold_tracker';
-		$wpdb->query("DROP TABLE IF EXISTS {$table_name}");
+		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
 	}
 }
