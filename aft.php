@@ -15,10 +15,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use Above_Fold_Tracker\Above_Fold_Tracker_Core;
 
-register_activation_hook(__FILE__, [Above_Fold_Tracker_Core::class, 'af_tracker_activate']);
-register_deactivation_hook(__FILE__, [Above_Fold_Tracker_Core::class, 'af_tracker_deactivate']);
-register_uninstall_hook(__FILE__, [Above_Fold_Tracker_Core::class, 'af_tracker_uninstall']);
+if (class_exists('Above_Fold_Tracker\Above_Fold_Tracker_Core')) {
+	$core = new Above_Fold_Tracker_Core();
+	$core->init();
 
-add_action('plugins_loaded', function () {
-	Above_Fold_Tracker_Core::init();
-});
+	register_activation_hook(__FILE__, ['Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_activate']);
+	register_deactivation_hook(__FILE__, ['Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_deactivate']);
+	register_uninstall_hook(__FILE__, ['Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_uninstall']);
+}
