@@ -1,14 +1,14 @@
 <?php
 /**
- *  Exception handling
+ * Exception handling for the Above The Fold Tracker plugin
  *
- * @package     TO FILL
- * @since       TO FILL
- * @author      Mathieu Lamiot
+ * @package     AboveFoldTracker
+ * @since       1.0.0
+ * @author      Samson Ogheneakporbo Moses
  * @license     GPL-2.0-or-later
  */
 
-namespace ROCKET_WP_CRAWLER;
+namespace Above_Fold_Tracker\Support;
 
 // Automatically added when writing the WHOOPS section below to find the whoops functions.
 use Whoops\Handler\PrettyPageHandler;

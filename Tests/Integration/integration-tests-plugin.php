@@ -10,7 +10,7 @@
 
 namespace ROCKET_WP_CRAWLER;
 
-require_once dirname(dirname(__DIR__)) . "/plugin.php";
+require_once dirname(dirname(__DIR__)) . "/aft.php";
 
 use WPMedia\PHPUnit\Integration\TestCase;
 use Brain\Monkey\Functions;
