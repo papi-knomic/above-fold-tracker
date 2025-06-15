@@ -10,6 +10,8 @@
 
 namespace Above_Fold_Tracker;
 
+use Above_Fold_Tracker\Services\AFT_Database;
+
 if (class_exists('Above_Fold_Tracker_Core')) {
 	return;
 }
@@ -45,7 +47,7 @@ class Above_Fold_Tracker_Core {
 		check_admin_referer( "activate-plugin_{$plugin}" );
 
 		// Create necessary database tables
-		AFT_Migration::create_tables();
+		AFT_Database::create_tables();
 
 		// Schedule the cleanup event
 		if (!wp_next_scheduled('above_fold_tracker_cleanup')) {
