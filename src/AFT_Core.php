@@ -10,7 +10,9 @@
 
 namespace AFT\Plugin;
 
+use AFT\Plugin\Services\AFT_Admin;
 use AFT\Plugin\Services\AFT_Database;
+use AFT\Plugin\Services\AFT_Tracker;
 
 if ( class_exists( 'AFT_Core' ) ) {
 	return;
@@ -28,38 +30,11 @@ class AFT_Core {
 	 */
 	public function init() {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			require_once plugin_dir_path( __DIR__ ) . '/Support/exceptions.php';
+			require_once plugin_dir_path( __DIR__ ) . 'src/Support/exceptions.php';
 		}
 
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tracking_script' ) );
-	}
-
-	/**
-	 * Enqueues the tracking script on the frontend.
-	 *
-	 * @return void
-	 */
-	public function enqueue_tracking_script() {
-		if ( ! is_front_page() ) {
-			return;
-		}
-
-		wp_enqueue_script(
-			'above-fold-tracker-script',
-			plugins_url( 'assets/js/tracker.js', __FILE__ ),
-			array(),
-			'1.0.0',
-			true
-		);
-
-		wp_localize_script(
-			'above-fold-tracker-script',
-			'aft_data',
-			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'af_tracker_nonce' ),
-			)
-		);
+		( new AFT_Tracker() )->init();
+		( new AFT_Admin() )->init();
 	}
 
 	/**
