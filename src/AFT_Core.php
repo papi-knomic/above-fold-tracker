@@ -8,18 +8,18 @@
  * @license     GPL-2.0-or-later
  */
 
-namespace Above_Fold_Tracker;
+namespace Above_Fold_Tracker_Plugin;
 
-use Above_Fold_Tracker\Services\AFT_Database;
+use Above_Fold_Tracker_Plugin\Services\AFT_Database;
 
-if ( class_exists( 'Above_Fold_Tracker_Core' ) ) {
+if ( class_exists( 'AFT_Core' ) ) {
 	return;
 }
 
 /**
  * Main plugin class. It manages initialization, install, and activations.
  */
-class Above_Fold_Tracker_Core {
+class AFT_Core {
 
 	/**
 	 * Initializes the plugin by loading necessary files and setting up hooks.
@@ -40,9 +40,7 @@ class Above_Fold_Tracker_Core {
 	 * @return void
 	 */
 	public function enqueue_tracking_script() {
-		if ( ! is_front_page() ) {
-			return; // Load script only on the homepage
-		}
+		if ( ! is_front_page() ) return;
 
 		wp_enqueue_script(
 			'above-fold-tracker-script',
@@ -108,9 +106,6 @@ class Above_Fold_Tracker_Core {
 			return;
 		}
 
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . 'above_fold_tracking';
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+		AFT_Database::drop_table();
 	}
 }

@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Above_Fold_Tracker\\": "src/"
+            "Above_Fold_Tracker_Plugin\\": "src/"
         }
     },
     "extra": {

@@ -8,7 +8,7 @@
  * @license     GPL-2.0-or-later
  */
 
-namespace Above_Fold_Tracker\Services;
+namespace Above_Fold_Tracker_Plugin\Services;
 
 if ( class_exists( 'AFT_Database' ) ) {
 	return;
@@ -48,6 +48,8 @@ class AFT_Database {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'above_fold_tracker';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Schema changes are safe
 		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
 	}
 }

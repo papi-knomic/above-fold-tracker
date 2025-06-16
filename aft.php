@@ -13,13 +13,13 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Above_Fold_Tracker\Above_Fold_Tracker_Core;
+use Above_Fold_Tracker_Plugin\AFT_Core;
 
-if ( class_exists( 'Above_Fold_Tracker\Above_Fold_Tracker_Core' ) ) {
-	$core = new Above_Fold_Tracker_Core();
-	$core->init();
+if ( class_exists('Above_Fold_Tracker_Plugin\AFT_Core') ) {
+	$aft_core = new AFT_Core();
+	$aft_core->init();
 
-	register_activation_hook( __FILE__, array( 'Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_activate' ) );
-	register_deactivation_hook( __FILE__, array( 'Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_deactivate' ) );
-	register_uninstall_hook( __FILE__, array( 'Above_Fold_Tracker\Above_Fold_Tracker_Core', 'af_tracker_uninstall' ) );
+	register_activation_hook( __FILE__, array('Above_Fold_Tracker_Plugin\AFT_Core', 'af_tracker_activate' ) );
+	register_deactivation_hook( __FILE__, array('Above_Fold_Tracker_Plugin\AFT_Core', 'af_tracker_deactivate' ) );
+	register_uninstall_hook( __FILE__, array('Above_Fold_Tracker_Plugin\AFT_Core', 'af_tracker_uninstall' ) );
 }
