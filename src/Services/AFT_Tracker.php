@@ -1,6 +1,6 @@
 <?php
 
-namespace Above_Fold_Tracker_Plugin\Services;
+namespace AFT\Plugin\Services;
 
 if ( class_exists( 'AFT_Tracker' ) ) {
 	return;

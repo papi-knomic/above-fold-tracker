@@ -8,7 +8,7 @@
  * @license     GPL-2.0-or-later
  */
 
-namespace Above_Fold_Tracker_Plugin\Services;
+namespace AFT\Plugin\Services;
 
 if ( class_exists( 'AFT_Database' ) ) {
 	return;

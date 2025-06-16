@@ -8,7 +8,7 @@
  * @license     GPL-2.0-or-later
  */
 
-namespace Above_Fold_Tracker_Plugin\Support;
+namespace AFT\Plugin\Support;
 
 // Automatically added when writing the WHOOPS section below to find the whoops functions.
 use Whoops\Handler\PrettyPageHandler;

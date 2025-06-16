@@ -8,9 +8,9 @@
  * @license     GPL-2.0-or-later
  */
 
-namespace Above_Fold_Tracker_Plugin;
+namespace AFT\Plugin;
 
-use Above_Fold_Tracker_Plugin\Services\AFT_Database;
+use AFT\Plugin\Services\AFT_Database;
 
 if ( class_exists( 'AFT_Core' ) ) {
 	return;
@@ -40,7 +40,9 @@ class AFT_Core {
 	 * @return void
 	 */
 	public function enqueue_tracking_script() {
-		if ( ! is_front_page() ) return;
+		if ( ! is_front_page() ) {
+			return;
+		}
 
 		wp_enqueue_script(
 			'above-fold-tracker-script',
