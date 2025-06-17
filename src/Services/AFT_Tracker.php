@@ -60,11 +60,18 @@ class AFT_Tracker {
 
 		$links       = array_map( 'esc_url_raw', $_POST['links'] );
 		$screen_size = array(
-			'width'  => isset($_POST['screen_size']['width']) ? intval( $_POST['screen_size']['width'] ) : 0,
-			'height' => isset($_POST['screen_size']['height']) ? intval( $_POST['screen_size']['height'] ) : 0,
+			'width'  => isset( $_POST['screen_size']['width'] ) ? intval( $_POST['screen_size']['width'] ) : 0,
+			'height' => isset( $_POST['screen_size']['height'] ) ? intval( $_POST['screen_size']['height'] ) : 0,
 		);
 
-		AFT_Database::store_tracking_data( $links, $screen_size );
+		$visit_id = isset( $_COOKIE['aft_visit_id'] ) ? sanitize_text_field( $_COOKIE['aft_visit_id'] ) : '';
+
+		if (empty($visit_id)) {
+			$visit_id = md5( $_SERVER['REMOTE_ADDR'] . wp_rand() );
+			setcookie('aft_visit_id', $visit_id, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
+		}
+
+		AFT_Database::store_tracking_data( $links, $screen_size, $visit_id );
 
 		wp_send_json_success( 'Tracking data stored.' );
 	}

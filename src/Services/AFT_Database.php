@@ -34,7 +34,10 @@ class AFT_Database {
             screen_height INT NOT NULL,
             visit_time INT NOT NULL, -- Unix timestamp
             visit_id VARCHAR(64) NOT NULL,
-            KEY visit_time_index (visit_time)
+            page_url VARCHAR(255) NOT NULL,
+            KEY visit_id (visit_id),
+            KEY url (url),
+            KEY visit_time (visit_time)
         ) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -59,15 +62,30 @@ class AFT_Database {
 	 * @param array $links Array of links to track.
 	 * @param array $screen_size Array containing 'width' and 'height' of the screen.
 	 */
-	public static function store_tracking_data( array $links, array $screen_size ) {
+	public static function store_tracking_data( array $links, array $screen_size, string $visit_id ) {
 		global $wpdb;
 
 		$table_name    = $wpdb->prefix . 'above_fold_tracker';
+
+		$recent_entry = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM $table_name WHERE visit_id = %s AND visit_time > %d",
+				$visit_id,
+				( time() - 10 ) //allow only 1 entry every 10 seconds
+			)
+		);
+
+		if ( $recent_entry > 0 ) {
+			error_log('You visited before');
+			return; // Rate limit triggered, skip storing
+		}
+
 		$screen_width  = intval( $screen_size['width'] );
 		$screen_height = intval( $screen_size['height'] );
 
-		$visit_id   = md5( $_SERVER['REMOTE_ADDR'] . wp_rand() );
 		$visit_time = time();
+		$page_url = esc_url_raw($_SERVER['REQUEST_URI']);
+
 
 		foreach ( $links as $link ) {
 			$prepared_link = esc_url_raw( $link );
@@ -81,6 +99,7 @@ class AFT_Database {
 					'screen_height' => $screen_height,
 					'visit_time'    => $visit_time,
 					'visit_id'      => $visit_id,
+					'page_url'      => $page_url
 				),
 				array(
 					'%s',
@@ -88,6 +107,7 @@ class AFT_Database {
 					'%d',
 					'%d',
 					'%s',
+					'%s'
 				)
 			);
 		}
