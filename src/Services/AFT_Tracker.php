@@ -24,7 +24,9 @@ class AFT_Tracker {
 	 * @return void
 	 */
 	public function enqueue_tracking_script() {
-		if ( ! is_front_page() ) {
+		$load_on_all_pages = apply_filters( 'aft_load_tracking_script_on_all_pages', false );
+
+		if ( ! $load_on_all_pages && ! is_front_page() ) {
 			return;
 		}
 
@@ -71,7 +73,9 @@ class AFT_Tracker {
 			setcookie('aft_visit_id', $visit_id, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
 		}
 
-		AFT_Database::store_tracking_data( $links, $screen_size, $visit_id );
+		$page_url = isset( $_POST['page_url'] ) ? esc_url_raw( $_POST['page_url'] ) : '';
+
+		AFT_Database::store_tracking_data( $links, $screen_size, $visit_id, $page_url );
 
 		wp_send_json_success( 'Tracking data stored.' );
 	}

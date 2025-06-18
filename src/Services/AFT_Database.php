@@ -29,7 +29,7 @@ class AFT_Database {
 
 		$sql = "CREATE TABLE {$table_name} (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            url TEXT NOT NULL,
+            url VARCHAR(255) NOT NULL,
             screen_width INT NOT NULL,
             screen_height INT NOT NULL,
             visit_time INT NOT NULL, -- Unix timestamp
@@ -61,8 +61,12 @@ class AFT_Database {
 	 *
 	 * @param array $links Array of links to track.
 	 * @param array $screen_size Array containing 'width' and 'height' of the screen.
+	 * @param string $visit_id Unique identifier for the visit.
+	 * @param string $page_url URL of the page being tracked.
+	 *
+	 * @return void
 	 */
-	public static function store_tracking_data( array $links, array $screen_size, string $visit_id ) {
+	public static function store_tracking_data( array $links, array $screen_size, string $visit_id, string $page_url) {
 		global $wpdb;
 
 		$table_name    = $wpdb->prefix . 'above_fold_tracker';
@@ -84,10 +88,16 @@ class AFT_Database {
 		$screen_height = intval( $screen_size['height'] );
 
 		$visit_time = time();
-		$page_url = esc_url_raw($_SERVER['REQUEST_URI']);
+		$page_url = esc_url_raw( $page_url );
 
 
 		foreach ( $links as $link ) {
+
+			if ( ! filter_var( $link, FILTER_VALIDATE_URL ) ) {
+				error_log( 'Invalid URL: ' . $link );
+				continue;
+			}
+
 			$prepared_link = esc_url_raw( $link );
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- Tracking writes are acceptable here
