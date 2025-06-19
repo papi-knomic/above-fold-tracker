@@ -12,6 +12,7 @@ namespace AFT\Plugin;
 
 use AFT\Plugin\Services\AFT_Admin;
 use AFT\Plugin\Services\AFT_Database;
+use AFT\Plugin\Services\AFT_Settings;
 use AFT\Plugin\Services\AFT_Tracker;
 
 if ( class_exists( 'AFT_Core' ) ) {
@@ -33,8 +34,11 @@ class AFT_Core {
 			require_once plugin_dir_path( __DIR__ ) . 'src/Support/exceptions.php';
 		}
 
-		( new AFT_Tracker() )->init();
 		( new AFT_Admin() )->init();
+		( new AFT_Settings() )->init();
+		( new AFT_Tracker() )->init();
+
+		add_action( 'aft_cleanup_event', [ '\AFT\Plugin\Services\AFT_Database', 'cleanup_old_tracking_data' ] );
 	}
 
 	/**

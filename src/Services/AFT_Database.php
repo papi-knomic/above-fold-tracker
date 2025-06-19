@@ -59,28 +59,28 @@ class AFT_Database {
 	/**
 	 * Store tracking data in the database.
 	 *
-	 * @param array $links Array of links to track.
-	 * @param array $screen_size Array containing 'width' and 'height' of the screen.
+	 * @param array  $links Array of links to track.
+	 * @param array  $screen_size Array containing 'width' and 'height' of the screen.
 	 * @param string $visit_id Unique identifier for the visit.
 	 * @param string $page_url URL of the page being tracked.
 	 *
 	 * @return void
 	 */
-	public static function store_tracking_data( array $links, array $screen_size, string $visit_id, string $page_url) {
+	public static function store_tracking_data( array $links, array $screen_size, string $visit_id, string $page_url ) {
 		global $wpdb;
 
-		$table_name    = $wpdb->prefix . 'above_fold_tracker';
+		$table_name = $wpdb->prefix . 'above_fold_tracker';
 
 		$recent_entry = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM $table_name WHERE visit_id = %s AND visit_time > %d",
 				$visit_id,
-				( time() - 10 ) //allow only 1 entry every 10 seconds
+				( time() - 10 ) // allow only 1 entry every 10 seconds
 			)
 		);
 
 		if ( $recent_entry > 0 ) {
-			error_log('You visited before');
+			error_log( 'You visited before' );
 			return; // Rate limit triggered, skip storing
 		}
 
@@ -88,8 +88,7 @@ class AFT_Database {
 		$screen_height = intval( $screen_size['height'] );
 
 		$visit_time = time();
-		$page_url = esc_url_raw( $page_url );
-
+		$page_url   = esc_url_raw( $page_url );
 
 		foreach ( $links as $link ) {
 
@@ -109,7 +108,7 @@ class AFT_Database {
 					'screen_height' => $screen_height,
 					'visit_time'    => $visit_time,
 					'visit_id'      => $visit_id,
-					'page_url'      => $page_url
+					'page_url'      => $page_url,
 				),
 				array(
 					'%s',
@@ -117,9 +116,39 @@ class AFT_Database {
 					'%d',
 					'%d',
 					'%s',
-					'%s'
+					'%s',
 				)
 			);
 		}
+	}
+
+	/**
+	 * Cleans up tracking records older than the retention period.
+	 *
+	 * @return void
+	 */
+	public static function cleanup_old_tracking_data() {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'above_fold_tracker';
+
+		// Get the retention period from settings (default to 7 days if not set)
+		$retention_days = intval( get_option( 'aft_data_retention_days', 7 ) );
+
+		// Ensure retention days is a positive integer
+		if ( $retention_days <= 0 ) {
+			$retention_days = 7; // Default to 7 days if invalid1
+		}
+
+		// Calculate cutoff time
+		$cutoff_time = time() - ( $retention_days * DAY_IN_SECONDS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- Cleanup writes are acceptable here
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$table_name} WHERE visit_time < %d",
+				$cutoff_time
+			)
+		);
 	}
 }
