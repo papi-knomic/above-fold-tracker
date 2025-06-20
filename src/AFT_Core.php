@@ -10,7 +10,7 @@
 
 namespace AFT\Plugin;
 
-use AFT\Plugin\Services\AFT_Admin;
+use AFT\Plugin\Admin\AFT_Admin;
 use AFT\Plugin\Services\AFT_Database;
 use AFT\Plugin\Services\AFT_Settings;
 use AFT\Plugin\Services\AFT_Tracker;
@@ -23,6 +23,10 @@ if ( class_exists( 'AFT_Core' ) ) {
  * Main plugin class. It manages initialization, install, and activations.
  */
 class AFT_Core {
+
+	public $plugin_url;
+
+	public $plugin_path;
 
 	/**
 	 * Initializes the plugin by loading necessary files and setting up hooks.
@@ -38,8 +42,32 @@ class AFT_Core {
 		( new AFT_Settings() )->init();
 		( new AFT_Tracker() )->init();
 
-		add_action( 'aft_cleanup_event', [ '\AFT\Plugin\Services\AFT_Database', 'cleanup_old_tracking_data' ] );
+		add_action( 'aft_cleanup_event', array( '\AFT\Plugin\Services\AFT_Database', 'cleanup_old_tracking_data' ) );
 	}
+
+	/**
+	 * Loads a PHP template file and passes variables to it.
+	 *
+	 * @param string $template The template filename relative to src/templates (without .php extension).
+	 * @param array  $variables Associative array of variables to extract for the template.
+	 *
+	 * @return void
+	 */
+	public static function load_template( string $template, array $variables = array() ) {
+		$plugin_path   = untrailingslashit( plugin_dir_path( __FILE__ ) );
+		$template_path = $plugin_path . '/templates/' . $template;
+
+		if ( ! file_exists( $template_path ) ) {
+			wp_die( esc_html__( 'Template not found: ', 'aft' ) . esc_html( $template_path ) );
+		}
+
+		// Extract variables to local scope
+		extract( $variables );
+
+		// Load the template
+		include $template_path;
+	}
+
 
 	/**
 	 * Handles plugin activation.
