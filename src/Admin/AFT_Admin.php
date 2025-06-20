@@ -23,6 +23,16 @@ class AFT_Admin {
 	 */
 	public function init() {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+	}
+
+	/**
+	 * Enqueues admin scripts and styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_admin_scripts() {
+		wp_enqueue_script('thickbox');
 	}
 
 	/**
@@ -43,7 +53,7 @@ class AFT_Admin {
 		add_submenu_page(
 			'aft',
 			__( 'Reports', 'aft' ),
-			__( 'View Reports', 'aft' ),
+			__( 'Reports', 'aft' ),
 			'manage_options',
 			'aft',
 			array( $this, 'render_reports_page' )
@@ -52,7 +62,7 @@ class AFT_Admin {
 		add_submenu_page(
 			'aft',
 			__( 'Visits', 'aft' ),
-			__( 'View Visits', 'aft' ),
+			__( 'Visits', 'aft' ),
 			'manage_options',
 			'aft-visits',
 			array( $this, 'render_visits_page' )
@@ -114,7 +124,7 @@ class AFT_Admin {
 		AFT_Core::load_template(
 			'wp-admin/visits.php',
 			array(
-				'visits_list' => $aft_visits_list,
+				'aft_visits_list' => $aft_visits_list,
 			)
 		);
 	}

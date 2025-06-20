@@ -25,7 +25,7 @@ class AFT_Visits_List extends \WP_List_Table {
 			'screen_size' => __( 'Screen Size', 'aft' ),
 			'visit_time'  => __( 'Visit Time', 'aft' ),
 			'page_url'    => __( 'Page URL', 'aft' ),
-			'links'       => __( 'View Links', 'aft' ),
+			'links'       => __( 'Links', 'aft' ),
 		);
 	}
 
@@ -37,7 +37,7 @@ class AFT_Visits_List extends \WP_List_Table {
 	 * @return void
 	 */
 	public function column_default( $item, $column_name ) {
-		return $item[ $column_name ];
+		return $item->{$column_name};
 	}
 
 
@@ -54,12 +54,24 @@ class AFT_Visits_List extends \WP_List_Table {
 	}
 
 	public function column_links( $item ) {
-		$view_url = admin_url( 'admin.php?page=aft_visits&view=' . $item->visit_id );
-		return sprintf(
-			'<a href="%s" class="button button-primary">%s</a>',
-			esc_url( $view_url ),
-			__( 'View Details', 'aft' )
+		if ( empty( $item->links ) ) {
+			return 'No links tracked';
+		}
+
+		$details = implode( "\n", array_map( 'esc_url', $item->links ) );
+
+		$output  = sprintf(
+			'<a href="#TB_inline?width=600&height=400&inlineId=links-%s" class="thickbox button">View Links</a>',
+			esc_attr( $item->visit_id )
 		);
+
+		$output .= sprintf(
+			'<div id="links-%s" style="display:none;"><pre>%s</pre></div>',
+			esc_attr( $item->visit_id ),
+			esc_html( $details )
+		);
+
+		return $output;
 	}
 
 
@@ -76,21 +88,40 @@ class AFT_Visits_List extends \WP_List_Table {
 
 		$total_items = $wpdb->get_var( "SELECT COUNT(DISTINCT visit_id) FROM {$table_name}" );
 
-		$this->items = $wpdb->get_results(
+		$visits = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT DISTINCT visit_id, screen_width, screen_height, visit_time, page_url 
-                 FROM {$table_name} 
-                 ORDER BY visit_time DESC 
-                 LIMIT %d OFFSET %d",
+             FROM {$table_name} 
+             ORDER BY visit_time DESC 
+             LIMIT %d OFFSET %d",
 				$per_page,
 				$offset
 			)
+		);
+
+		// For each visit, fetch links and store them
+		foreach ( $visits as &$visit ) {
+			$visit->links = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT url FROM {$table_name} WHERE visit_id = %s",
+					$visit->visit_id
+				)
+			);
+		}
+
+		$this->items = $visits;
+
+		$this->_column_headers = array(
+			$this->get_columns(),
+			array(),
+			array(),
 		);
 
 		$this->set_pagination_args(
 			array(
 				'total_items' => $total_items,
 				'per_page'    => $per_page,
+				'total_pages' => ceil( $total_items / $per_page ),
 			)
 		);
 	}

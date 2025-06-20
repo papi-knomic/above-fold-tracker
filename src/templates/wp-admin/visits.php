@@ -1,21 +1,20 @@
 <?php if ( ! defined( 'ABSPATH' ) ) {
-	die( 'No direct access.' );} ?>
-
-
+	die( 'No direct access.' );
+} ?>
 
 <div class="wrap">
-	<h1>Above the Fold Tracker - Visit Sessions</h1>';
-	<div class="postbox">
-		<div class="inside">
-			<?php
-			$transactionList->prepare_items();
-			?>
-			<form id="tables-filter" method="get">
-				<input type="hidden" name="page" value="<?php echo esc_attr( $page ); ?>" />
-				<?php
-				$transactionList->display();
-				?>
-			</form>
-		</div>
-	</div>
-</div>';
+    <h1><?php esc_html_e( 'Above the Fold Tracker - Visit Sessions', 'aft' ); ?></h1>
+
+	<?php
+	// Prepare the table items
+	$aft_visits_list->prepare_items();
+	?>
+
+    <form id="tables-filter" method="get">
+        <input type="hidden" name="page" value="<?php echo isset( $_REQUEST['page'] ) ? esc_attr( $_REQUEST['page'] ) : ''; ?>" />
+		<?php
+		// Display the table
+		$aft_visits_list->display();
+		?>
+    </form>
+</div>

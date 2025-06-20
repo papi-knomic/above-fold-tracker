@@ -1,5 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) {
-	die( 'No direct access.' );} ?>
+	die( 'No direct access.' );
+} ?>
 
 <div class="wrap">
 	<h1><?php esc_html_e( 'Above Fold Tracker - Documentation', 'aft' ); ?></h1>

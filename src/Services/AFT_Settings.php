@@ -2,6 +2,8 @@
 
 namespace AFT\Plugin\Services;
 
+use AFT\Plugin\AFT_Core;
+
 class AFT_Settings {
 
 	/**
@@ -64,10 +66,10 @@ class AFT_Settings {
 	 */
 	public function show_on_all_pages_field() {
 		$value = get_option( 'aft_show_on_all_pages', '0' );
-		?>
-		<input type="checkbox" name="aft_show_on_all_pages" value="1" <?php checked( 1, $value ); ?>>
-		<label><?php esc_html_e( 'Track above the fold on all pages instead of only the front page.', 'aft' ); ?></label>
-		<?php
+
+        AFT_Core::load_template('wp-admin/partials/all-pages.php', array(
+            'value' => $value
+        ));
 	}
 
 	/**
@@ -77,10 +79,11 @@ class AFT_Settings {
 	 */
 	public function rate_limit_seconds_field() {
 		$value = get_option( 'aft_rate_limit_seconds', 10 );
-		?>
-		<input type="number" name="aft_rate_limit_seconds" value="<?php echo esc_attr( $value ); ?>" min="1">
-		<label><?php esc_html_e( 'Minimum seconds between allowed tracking requests per visitor.', 'aft' ); ?></label>
-		<?php
+
+        AFT_Core::load_template( 'wp-admin/partials/rate-limit.php', array(
+            'value' => $value
+            )
+        );
 	}
 
 	/**
@@ -90,9 +93,9 @@ class AFT_Settings {
 	 */
 	public function data_retention_days_field() {
 		$value = get_option( 'aft_data_retention_days', 7 );
-		?>
-		<input type="number" name="aft_data_retention_days" value="<?php echo esc_attr( $value ); ?>" min="1">
-		<label><?php esc_html_e( 'Number of days to keep tracking data before automatic cleanup.', 'aft' ); ?></label>
-		<?php
+        AFT_Core::load_template( 'wp-admin/partials/data-retention.php', array(
+            'value' => $value
+            )
+        );
 	}
 }

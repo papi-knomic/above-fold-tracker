@@ -12,41 +12,8 @@ class AFT_Tracker {
 	 * Initializes the tracker service.
 	 */
 	public function init() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tracking_script' ) );
 		add_action( 'wp_ajax_nopriv_aft_track_links', array( $this, 'handle_link_tracking' ) );
 		add_action( 'wp_ajax_aft_track_links', array( $this, 'handle_link_tracking' ) );
-	}
-
-
-	/**
-	 * Enqueues the tracking script on the frontend.
-	 *
-	 * @return void
-	 */
-	public function enqueue_tracking_script() {
-		$load_on_all_pages = get_option( 'aft_show_on_all_pages', '0' );
-		$load_on_all_pages = $load_on_all_pages == '1';
-
-		if ( ! $load_on_all_pages && ! is_front_page() ) {
-			return;
-		}
-
-		wp_enqueue_script(
-			'above-fold-tracker-frontend',
-			plugins_url( '../js/aft_frontend.js', __FILE__ ),
-			array( 'jquery' ),
-			'1.0.0',
-			true
-		);
-
-		wp_localize_script(
-			'above-fold-tracker-frontend',
-			'aft_frontend_data',
-			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'af_tracker_nonce' ),
-			)
-		);
 	}
 
 	/**

@@ -12,6 +12,7 @@ namespace AFT\Plugin;
 
 use AFT\Plugin\Admin\AFT_Admin;
 use AFT\Plugin\Services\AFT_Database;
+use AFT\Plugin\Services\AFT_Enqueue;
 use AFT\Plugin\Services\AFT_Settings;
 use AFT\Plugin\Services\AFT_Tracker;
 
@@ -24,10 +25,6 @@ if ( class_exists( 'AFT_Core' ) ) {
  */
 class AFT_Core {
 
-	public $plugin_url;
-
-	public $plugin_path;
-
 	/**
 	 * Initializes the plugin by loading necessary files and setting up hooks.
 	 *
@@ -38,6 +35,7 @@ class AFT_Core {
 			require_once plugin_dir_path( __DIR__ ) . 'src/Support/exceptions.php';
 		}
 
+		( new AFT_Enqueue() )->init();
 		( new AFT_Admin() )->init();
 		( new AFT_Settings() )->init();
 		( new AFT_Tracker() )->init();
@@ -54,8 +52,8 @@ class AFT_Core {
 	 * @return void
 	 */
 	public static function load_template( string $template, array $variables = array() ) {
-		$plugin_path   = untrailingslashit( plugin_dir_path( __FILE__ ) );
-		$template_path = $plugin_path . '/templates/' . $template;
+		$base_path   = untrailingslashit( plugin_dir_path( __FILE__ ) );
+		$template_path = $base_path . '/templates/' . $template;
 
 		if ( ! file_exists( $template_path ) ) {
 			wp_die( esc_html__( 'Template not found: ', 'aft' ) . esc_html( $template_path ) );
