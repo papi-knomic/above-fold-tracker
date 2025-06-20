@@ -14,7 +14,7 @@
 		</thead>
 		<tbody>
 		<?php if ( $results ) : ?>
-			<?php foreach ( $results as $row ) : ?>
+			<?php foreach ( $results as $row ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $row is not a global variable ?>
 				<tr>
 					<td><a href="<?php echo esc_url( $row->url ); ?>" target="_blank"><?php echo esc_html( $row->url ); ?></a></td>
 					<td><?php echo intval( $row->total ); ?></td>

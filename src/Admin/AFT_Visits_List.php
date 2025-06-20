@@ -9,16 +9,20 @@ class AFT_Visits_List extends \WP_List_Table {
 	 */
 	public function __construct() {
 
-		// Set parent defaults
 		parent::__construct(
 			array(
-				'singular' => 'item', // singular name of the listed records
-				'plural'   => 'items',  // plural name of the listed records
-				'ajax'     => false,       // does this table support ajax?
+				'singular' => 'item',
+				'plural'   => 'items',
+				'ajax'     => false,
 			)
 		);
 	}
 
+	/**
+	 * Returns the columns to be displayed in the table
+	 *
+	 * @return array
+	 */
 	public function get_columns() {
 		return array(
 			'visit_id'    => __( 'Visit ID', 'aft' ),
@@ -32,27 +36,56 @@ class AFT_Visits_List extends \WP_List_Table {
 	/**
 	 * Returns the default column item
 	 *
-	 * @param object $item
-	 * @param string $column_name
-	 * @return void
+	 * @param object $item - data for the columns on the current row.
+	 * @param string $column_name - the name of the column to be displayed.
+	 *
+	 * @return string
 	 */
 	public function column_default( $item, $column_name ) {
 		return $item->{$column_name};
 	}
 
 
+	/**
+	 * Returns the screen size column HTML to be rendered.
+	 *
+	 * @param object $item - data for the columns on the current row.
+	 *
+	 * @return string
+	 */
 	public function column_screen_size( $item ) {
 		return sprintf( '%d x %d', $item->screen_width, $item->screen_height );
 	}
 
+	/**
+	 * Returns the visit time column HTML to be rendered.
+	 *
+	 * @param object $item - data for the columns on the current row.
+	 *
+	 * @return string
+	 */
 	public function column_visit_time( $item ) {
-		return date( 'Y-m-d H:i:s', $item->visit_time );
+		return gmdate( 'Y-m-d H:i:s', $item->visit_time );
 	}
 
+	/**
+	 * Returns the visit ID column HTML to be rendered.
+	 *
+	 * @param object $item - data for the columns on the current row.
+	 *
+	 * @return string
+	 */
 	public function column_page_url( $item ) {
 		return '<a href="' . esc_url( $item->page_url ) . '" target="_blank">' . esc_html( $item->page_url ) . '</a>';
 	}
 
+	/**
+	 * Returns the links column HTML to be rendered.
+	 *
+	 * @param object $item - data for the columns on the current row.
+	 *
+	 * @return string
+	 */
 	public function column_links( $item ) {
 		if ( empty( $item->links ) ) {
 			return 'No links tracked';
@@ -60,7 +93,7 @@ class AFT_Visits_List extends \WP_List_Table {
 
 		$details = implode( "\n", array_map( 'esc_url', $item->links ) );
 
-		$output  = sprintf(
+		$output = sprintf(
 			'<a href="#TB_inline?width=600&height=400&inlineId=links-%s" class="thickbox button">View Links</a>',
 			esc_attr( $item->visit_id )
 		);
@@ -86,24 +119,21 @@ class AFT_Visits_List extends \WP_List_Table {
 		$offset       = ( $current_page - 1 ) * $per_page;
 		$table_name   = $wpdb->prefix . 'above_fold_tracker';
 
-		$total_items = $wpdb->get_var( "SELECT COUNT(DISTINCT visit_id) FROM {$table_name}" );
+		$total_items = $wpdb->get_var( "SELECT COUNT(DISTINCT visit_id) FROM {$table_name}" );  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- This is a simple query that does not require caching or prepared statements.
 
-		$visits = $wpdb->get_results(
+		$visits = $wpdb->get_results(  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This is a simple query that does not require caching.
 			$wpdb->prepare(
-				"SELECT DISTINCT visit_id, screen_width, screen_height, visit_time, page_url 
-             FROM {$table_name} 
-             ORDER BY visit_time DESC 
-             LIMIT %d OFFSET %d",
+				"SELECT DISTINCT visit_id, screen_width, screen_height, visit_time, page_url FROM {$table_name} ORDER BY visit_time DESC LIMIT %d OFFSET %d",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name can not be passed in the prepare statement.
 				$per_page,
 				$offset
 			)
 		);
 
-		// For each visit, fetch links and store them
+		// For each visit, fetch links and store them.
 		foreach ( $visits as &$visit ) {
-			$visit->links = $wpdb->get_col(
+			$visit->links = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This is a simple query that does not require caching.
 				$wpdb->prepare(
-					"SELECT url FROM {$table_name} WHERE visit_id = %s",
+					"SELECT url FROM {$table_name} WHERE visit_id = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name can not be passed in the prepare statement.
 					$visit->visit_id
 				)
 			);

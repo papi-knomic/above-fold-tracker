@@ -32,7 +32,7 @@ class AFT_Admin {
 	 * @return void
 	 */
 	public function enqueue_admin_scripts() {
-		wp_enqueue_script('thickbox');
+		wp_enqueue_script( 'thickbox' );
 	}
 
 	/**
@@ -101,8 +101,8 @@ class AFT_Admin {
 
 		$table_name = $wpdb->prefix . 'above_fold_tracker';
 
-		$results = $wpdb->get_results(
-			"SELECT url, COUNT(*) as total FROM {$table_name} GROUP BY url ORDER BY total DESC LIMIT 10"
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This is a simple query that does not require caching.
+			"SELECT url, COUNT(*) as total FROM {$table_name} GROUP BY url ORDER BY total DESC LIMIT 10" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name can not be passed in the prepare statement.
 		);
 
 		AFT_Core::load_template(

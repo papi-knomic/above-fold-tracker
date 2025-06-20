@@ -51,18 +51,17 @@ class AFT_Core {
 	 *
 	 * @return void
 	 */
-	public static function load_template( string $template, array $variables = array() ) {
-		$base_path   = untrailingslashit( plugin_dir_path( __FILE__ ) );
+	public static function load_template( $template, $variables = array() ) {
+		$base_path     = untrailingslashit( plugin_dir_path( __FILE__ ) );
 		$template_path = $base_path . '/templates/' . $template;
 
 		if ( ! file_exists( $template_path ) ) {
 			wp_die( esc_html__( 'Template not found: ', 'aft' ) . esc_html( $template_path ) );
 		}
 
-		// Extract variables to local scope
+		// phpcs:ignore WordPress.PHP.DontExtract.extract_extract -- Using extract here to simplify template variable access.
 		extract( $variables );
 
-		// Load the template
 		include $template_path;
 	}
 

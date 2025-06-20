@@ -3,18 +3,15 @@
 } ?>
 
 <div class="wrap">
-    <h1><?php esc_html_e( 'Above the Fold Tracker - Visit Sessions', 'aft' ); ?></h1>
+	<h1><?php esc_html_e( 'Above the Fold Tracker - Visit Sessions', 'aft' ); ?></h1>
 
 	<?php
-	// Prepare the table items
-	$aft_visits_list->prepare_items();
+		$aft_visits_list->prepare_items();
 	?>
 
-    <form id="tables-filter" method="get">
-        <input type="hidden" name="page" value="<?php echo isset( $_REQUEST['page'] ) ? esc_attr( $_REQUEST['page'] ) : ''; ?>" />
+	<form id="tables-filter" method="get">
 		<?php
-		// Display the table
-		$aft_visits_list->display();
+			$aft_visits_list->display();
 		?>
-    </form>
+	</form>
 </div>

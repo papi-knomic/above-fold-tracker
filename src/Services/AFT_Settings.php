@@ -67,9 +67,12 @@ class AFT_Settings {
 	public function show_on_all_pages_field() {
 		$value = get_option( 'aft_show_on_all_pages', '0' );
 
-        AFT_Core::load_template('wp-admin/partials/all-pages.php', array(
-            'value' => $value
-        ));
+		AFT_Core::load_template(
+			'wp-admin/partials/all-pages.php',
+			array(
+				'value' => $value,
+			)
+		);
 	}
 
 	/**
@@ -80,10 +83,12 @@ class AFT_Settings {
 	public function rate_limit_seconds_field() {
 		$value = get_option( 'aft_rate_limit_seconds', 10 );
 
-        AFT_Core::load_template( 'wp-admin/partials/rate-limit.php', array(
-            'value' => $value
-            )
-        );
+		AFT_Core::load_template(
+			'wp-admin/partials/rate-limit.php',
+			array(
+				'value' => $value,
+			)
+		);
 	}
 
 	/**
@@ -93,9 +98,11 @@ class AFT_Settings {
 	 */
 	public function data_retention_days_field() {
 		$value = get_option( 'aft_data_retention_days', 7 );
-        AFT_Core::load_template( 'wp-admin/partials/data-retention.php', array(
-            'value' => $value
-            )
-        );
+		AFT_Core::load_template(
+			'wp-admin/partials/data-retention.php',
+			array(
+				'value' => $value,
+			)
+		);
 	}
 }

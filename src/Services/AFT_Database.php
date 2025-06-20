@@ -66,22 +66,24 @@ class AFT_Database {
 	 *
 	 * @return void
 	 */
-	public static function store_tracking_data( array $links, array $screen_size, string $visit_id, string $page_url ) {
+	public static function store_tracking_data( $links, $screen_size, $visit_id, $page_url ) {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'above_fold_tracker';
+		$rate_limit = get_option( 'aft_rate_limit_seconds', 10 ); // Default to 10 seconds if not set.
+		$rate_limit = intval( $rate_limit );
+		$rate_limit = $rate_limit > 0 ? $rate_limit : 10; // Ensure a positive rate limit.
 
-		$recent_entry = $wpdb->get_var(
+		$recent_entry = $wpdb->get_var(  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This is a simple query that does not require caching.
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $table_name WHERE visit_id = %s AND visit_time > %d",
+				"SELECT COUNT(*) FROM $table_name WHERE visit_id = %s AND visit_time > %d",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name can not be passed in the prepare statement.
 				$visit_id,
-				( time() - 10 ) // allow only 1 entry every 10 seconds
+				( time() - $rate_limit )
 			)
 		);
 
 		if ( $recent_entry > 0 ) {
-			error_log( 'You visited before' );
-			return; // Rate limit triggered, skip storing
+			return;
 		}
 
 		$screen_width  = intval( $screen_size['width'] );
@@ -93,13 +95,12 @@ class AFT_Database {
 		foreach ( $links as $link ) {
 
 			if ( ! filter_var( $link, FILTER_VALIDATE_URL ) ) {
-				error_log( 'Invalid URL: ' . $link );
 				continue;
 			}
 
 			$prepared_link = esc_url_raw( $link );
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- Tracking writes are acceptable here
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Cache is not needed for this operation.
 			$wpdb->insert(
 				$table_name,
 				array(
@@ -132,21 +133,19 @@ class AFT_Database {
 
 		$table_name = $wpdb->prefix . 'above_fold_tracker';
 
-		// Get the retention period from settings (default to 7 days if not set)
+		// Get the retention period from settings (default to 7 days if not set).
 		$retention_days = intval( get_option( 'aft_data_retention_days', 7 ) );
 
-		// Ensure retention days is a positive integer
+		// Ensure retention days is a positive integer.
 		if ( $retention_days <= 0 ) {
-			$retention_days = 7; // Default to 7 days if invalid1
+			$retention_days = 7;
 		}
 
-		// Calculate cutoff time
 		$cutoff_time = time() - ( $retention_days * DAY_IN_SECONDS );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- Cleanup writes are acceptable here
-		$wpdb->query(
+		$wpdb->query(  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This is a simple query that does not require caching.
 			$wpdb->prepare(
-				"DELETE FROM {$table_name} WHERE visit_time < %d",
+				"DELETE FROM {$table_name} WHERE visit_time < %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name can not be passed in the prepare statement.
 				$cutoff_time
 			)
 		);
